@@ -37,7 +37,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: altayatalay/melodic-template:latest
-          target: Dockerfile.melodic
+          file: Dockerfile.melodic
 
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -46,4 +46,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: altayatalay/webtop:latest
-          target: Dockerfile.webtop
+          file: Dockerfile.webtop
