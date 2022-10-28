@@ -4,9 +4,10 @@ ENV DEBIAN_FRONTEND noninteractive
 # Update packages and install apps
 RUN apt-get update && \
   apt-get upgrade -y && \
-  apt-get -y install sudo git tmux vim zsh curl htop wget && \
+  apt-get -y install sudo ssh git tmux vim zsh curl htop wget && \
   useradd -ms /bin/zsh rosuser && echo "rosuser:rosuser" | chpasswd && adduser rosuser sudo && \
-  apt-get update
+  apt-get update && \
+  apt-get -y install ros-melodic-desktop-full
 
 # Run roscore as daemon process with pid 1
 RUN echo "#!/bin/zsh" > /bin/entrypoint.sh && \
@@ -14,6 +15,12 @@ RUN echo "#!/bin/zsh" > /bin/entrypoint.sh && \
   echo "/opt/ros/melodic/bin/roscore" >> /bin/entrypoint.sh && \
   chown rosuser:rosuser /bin/entrypoint.sh && \
   chmod +x /bin/entrypoint.sh
+
+# Enable X11 Forwarding
+RUN sed -i '/#X11Forwarding/ s/#X11Forwarding no/X11Forwarding yes/' /etc/ssh/sshd_config && \
+  sed -i '/#X11DisplayOffset 10/ s/#X11DisplayOffset/X11DisplayOffset/' /etc/ssh/sshd_config && \
+  sed -i '/#X11UseLocalhost/ s/#X11UseLocalhost yes/X11UseLocalhost no/' /etc/ssh/sshd_config && \
+  mkdir /run/sshd
 
 WORKDIR /home/rosuser
 COPY .tmux.conf ./
