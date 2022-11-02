@@ -35,7 +35,8 @@ RUN wget -q https://github.com/neovim/neovim/releases/download/v0.7.2/nvim-linux
   tar -zxvf nvim-linux64.tar.gz && \
   mv nvim-linux64/bin/nvim /usr/bin/ && chmod 0555 /usr/bin/nvim && \
   mv nvim-linux64/share/nvim /usr/share/ && chmod 0555 /usr/share/nvim && \
-  mv nvim-linux64/lib/nvim /usr/lib/x86_64-linux-gnu/ && chmod 0555 /usr/lib/x86_64-linux-gnu/nvim && \
+  arch=$(uname -i) && \
+  mv nvim-linux64/lib/nvim /usr/lib/${arch}-linux-gnu/ && chmod 0555 /usr/lib/${arch}-linux-gnu/nvim && \
   rm -rf nvim-linux64
 
 WORKDIR /home/rosuser
