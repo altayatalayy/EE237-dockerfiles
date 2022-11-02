@@ -4,13 +4,21 @@ ENV DEBIAN_FRONTEND noninteractive
 # Update packages and install apps
 RUN apt-get update && \
   apt-get upgrade -y && \
-  apt-get -y install sudo ssh git tmux vim zsh curl htop wget && \
-  useradd -ms /bin/zsh rosuser && echo "rosuser:rosuser" | chpasswd && adduser rosuser sudo && \
+  apt-get -y install sudo ssh git tmux zsh curl htop wget less file python-pip && \
   apt-get update && \
   apt-get -y install ros-melodic-desktop-full
 
+# Create user rosuser and add it to the group sudo
+# Ensure sudo group users are not asked for a password when using 
+# sudo command by ammending sudoers file
+RUN useradd -ms /bin/zsh rosuser && \
+  echo "rosuser:rosuser" | chpasswd && adduser rosuser sudo && \
+  echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# start sshd
 # Run roscore as daemon process with pid 1
 RUN echo "#!/bin/zsh" > /bin/entrypoint.sh && \
+  echo "sudo service ssh start" >> /bin/entrypoint.sh && \
   echo "source /opt/ros/melodic/setup.zsh" >> /bin/entrypoint.sh && \
   echo "/opt/ros/melodic/bin/roscore" >> /bin/entrypoint.sh && \
   chown rosuser:rosuser /bin/entrypoint.sh && \
@@ -21,6 +29,14 @@ RUN sed -i '/#X11Forwarding/ s/#X11Forwarding no/X11Forwarding yes/' /etc/ssh/ss
   sed -i '/#X11DisplayOffset 10/ s/#X11DisplayOffset/X11DisplayOffset/' /etc/ssh/sshd_config && \
   sed -i '/#X11UseLocalhost/ s/#X11UseLocalhost yes/X11UseLocalhost no/' /etc/ssh/sshd_config && \
   mkdir /run/sshd
+
+# Install nvim
+RUN wget -q https://github.com/neovim/neovim/releases/download/v0.7.2/nvim-linux64.tar.gz && \
+  tar -zxvf nvim-linux64.tar.gz && \
+  mv nvim-linux64/bin/nvim /usr/bin/nvim && chmod 0555 /usr/bin/nvim && \
+  mv nvim-linux64/share/nvim /usr/share/nvim && chmod 0555 /usr/share/nvim && \
+  mv nvim-linux64/lib/nvim /usr/lib/x86_64-linux-gnu/nvim && chmod 0555 /usr/lib/x86_64-linux-gnu/nvim && \
+  rm -rf nvim-linux64
 
 WORKDIR /home/rosuser
 COPY .tmux.conf ./
