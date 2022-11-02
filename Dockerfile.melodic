@@ -20,7 +20,7 @@ RUN useradd -ms /bin/zsh rosuser && \
 RUN echo "#!/bin/zsh" > /bin/entrypoint.sh && \
   echo "sudo service ssh start" >> /bin/entrypoint.sh && \
   echo "source /opt/ros/melodic/setup.zsh" >> /bin/entrypoint.sh && \
-  echo "/opt/ros/melodic/bin/roscore" >> /bin/entrypoint.sh && \
+  echo "exec /opt/ros/melodic/bin/roscore" >> /bin/entrypoint.sh && \
   chown rosuser:rosuser /bin/entrypoint.sh && \
   chmod +x /bin/entrypoint.sh
 
